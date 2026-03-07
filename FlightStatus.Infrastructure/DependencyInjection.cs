@@ -1,4 +1,6 @@
+using FlightStatus.Application.Auth;
 using FlightStatus.Infrastructure.Persistence;
+using FlightStatus.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +19,9 @@ public static class DependencyInjection
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenService>();
 
         return services;
     }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace FlightStatus.Infrastructure.Persistence;
 
 /// <summary>
-/// Контекст БД приложения. Code First.
+/// Контекст БД приложения.
 /// </summary>
 public class ApplicationDbContext : DbContext
 {

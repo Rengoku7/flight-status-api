@@ -18,9 +18,9 @@ public class FlightsRepository : IFlightsRepository
     {
         var query = _db.Flights.AsNoTracking();
         if (!string.IsNullOrWhiteSpace(origin))
-            query = query.Where(f => f.Origin == origin);
+            query = query.Where(f => EF.Functions.ILike(f.Origin, origin));
         if (!string.IsNullOrWhiteSpace(destination))
-            query = query.Where(f => f.Destination == destination);
+            query = query.Where(f => EF.Functions.ILike(f.Destination, destination));
         return await query.OrderBy(f => f.Arrival).ToListAsync(ct);
     }
 

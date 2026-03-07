@@ -16,6 +16,7 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssemblyContaining<LoginCommandValidator>();
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
         return services;

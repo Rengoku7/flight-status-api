@@ -6,9 +6,18 @@ using FlightStatus.Infrastructure.Persistence;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((ctx, cfg) =>
+{
+    cfg.ReadFrom.Configuration(ctx.Configuration)
+        .Enrich.FromLogContext()
+        .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day);
+});
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection(JwtConfiguration.SectionName));
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -34,7 +43,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(o => o.Filters.Add<FlightStatus.Api.Filters.ExceptionFilter>());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -68,17 +77,27 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+app.UseSerilogRequestLogging();
+
 app.Use(async (context, next) =>
 {
+    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
     try
     {
         await next(context);
     }
     catch (ValidationException ex)
     {
+        logger.LogWarning("Валидация: {Errors}", string.Join("; ", ex.Errors.Select(e => e.ErrorMessage)));
         context.Response.StatusCode = 400;
         var errors = ex.Errors.Select(e => e.ErrorMessage).ToList();
         await context.Response.WriteAsJsonAsync(new { success = false, title = "Ошибка валидации", errors });
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Необработанное исключение");
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsJsonAsync(new { success = false, title = "Ошибка сервера" });
     }
 });
 
@@ -98,6 +117,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapGet("/", () => Results.Ok(new { name = "Flight Status API", version = "1.0" }));
 
 app.Run();

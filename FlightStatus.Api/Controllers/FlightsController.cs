@@ -59,8 +59,6 @@ public class FlightsController : ControllerBase
     {
         command.FlightId = id;
         var result = await _mediator.Send(command);
-        if (result.IsFailure)
-            return result.Error.Code == "NotFound" ? NotFound(result.ToApiResult()) : BadRequest(result.ToApiResult());
         return Ok(result.ToApiResult("Статус обновлён"));
     }
 }

@@ -21,6 +21,7 @@ public class ExceptionFilter : IExceptionFilter
         var ex = context.Exception.GetBaseException();
         var (statusCode, result) = ex switch
         {
+            ApplicationNotFoundException => (404, ApiResult.FailureResult("Не найдено", ex.Message)),
             DomainException => (400, ApiResult.FailureResult("Ошибка домена", ex.Message)),
             ApplicationLayerException => (400, ApiResult.FailureResult("Ошибка приложения", ex.Message)),
             InfrastructureException => (500, ApiResult.FailureResult("Техническая ошибка", ex.Message)),

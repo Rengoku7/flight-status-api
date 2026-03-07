@@ -19,7 +19,7 @@ public class UpdateFlightStatusCommandHandler : ICommandHandler<UpdateFlightStat
     {
         var flight = await _repo.GetByIdAsync(request.FlightId, cancellationToken);
         if (flight == null)
-            return Result<Unit>.Failure(new Error("NotFound", "Рейс не найден"));
+            throw new ApplicationNotFoundException("Рейс не найден");
 
         flight.Status = request.Status;
         await _repo.UpdateAsync(flight, cancellationToken);

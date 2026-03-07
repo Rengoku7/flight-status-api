@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FlightStatus.Api.Controllers;
 
+/// <summary>Рейсы</summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]

@@ -6,6 +6,7 @@ using MediatR;
 
 namespace FlightStatus.Application.UseCases.Flights.Commands.AddFlight;
 
+/// <summary>Создаёт рейс в БД и возвращает его id.</summary>
 public class AddFlightCommandHandler : ICommandHandler<AddFlightCommand, FlightIdResult>
 {
     private readonly IFlightsRepository _repo;

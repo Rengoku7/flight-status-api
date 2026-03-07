@@ -2,6 +2,7 @@ using FluentValidation;
 
 namespace FlightStatus.Application.UseCases.Flights.Commands.AddFlight;
 
+/// <summary>Валидация полей команды добавления рейса.</summary>
 public class AddFlightCommandValidator : AbstractValidator<AddFlightCommand>
 {
     public AddFlightCommandValidator()

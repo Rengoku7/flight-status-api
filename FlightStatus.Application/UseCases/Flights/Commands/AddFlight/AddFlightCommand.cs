@@ -3,6 +3,7 @@ using FlightStatus.Domain.Enums;
 
 namespace FlightStatus.Application.UseCases.Flights.Commands.AddFlight;
 
+/// <summary>Команда создания рейса (тело POST api/flights).</summary>
 public class AddFlightCommand : ICommand<FlightIdResult>
 {
     public string Origin { get; set; } = string.Empty;
@@ -12,6 +13,7 @@ public class AddFlightCommand : ICommand<FlightIdResult>
     public FlightStatusKind Status { get; set; }
 }
 
+/// <summary>Ответ после создания рейса.</summary>
 public class FlightIdResult
 {
     public int Id { get; set; }

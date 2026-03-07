@@ -5,6 +5,7 @@ using MediatR;
 
 namespace FlightStatus.Application.UseCases.Flights.Commands.UpdateFlightStatus;
 
+/// <summary>Обновляет только статус рейса; при отсутствии рейса — NotFound.</summary>
 public class UpdateFlightStatusCommandHandler : ICommandHandler<UpdateFlightStatusCommand>
 {
     private readonly IFlightsRepository _repo;

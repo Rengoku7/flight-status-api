@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FlightStatus.Infrastructure.Persistence;
 
+/// <summary>Реализация репозитория рейсов.</summary>
 public class FlightsRepository : IFlightsRepository
 {
     private readonly ApplicationDbContext _db;

@@ -5,6 +5,7 @@ using MediatR;
 
 namespace FlightStatus.Application.UseCases.Flights.Queries.GetFlights;
 
+/// <summary>Обработчик запроса списка рейсов</summary>
 public class GetFlightsQueryHandler : IQueryHandler<GetFlightsQuery, List<FlightDto>>
 {
     private readonly IFlightsRepository _repo;

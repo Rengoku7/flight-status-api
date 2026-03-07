@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FlightStatus.Api.Controllers;
 
+/// <summary>Авторизация: получение JWT по логину и паролю.</summary>
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
@@ -19,6 +20,10 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>Вход. Возвращает токен и время истечения. Доступно без авторизации.</summary>
+    /// <param name="command">Username и Password.</param>
+    /// <response code="200">Успех — в data токен и expiresAt.</response>
+    /// <response code="401">Неверные учётные данные.</response>
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginCommand command)

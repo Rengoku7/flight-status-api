@@ -38,6 +38,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Flight Status API", Version = "v1" });
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, "FlightStatus.Api.xml");
+    if (File.Exists(xmlPath))
+        c.IncludeXmlComments(xmlPath);
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
@@ -84,12 +88,10 @@ using (var scope = app.Services.CreateScope())
     await DbSeeder.SeedAsync(db);
 }
 
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Flight Status API v1"));
 if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
     app.MapOpenApi();
-}
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

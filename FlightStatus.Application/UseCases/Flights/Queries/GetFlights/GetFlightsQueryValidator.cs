@@ -13,5 +13,8 @@ public class GetFlightsQueryValidator : AbstractValidator<GetFlightsQuery>
         RuleFor(x => x.Destination)
             .MaximumLength(256)
             .When(x => !string.IsNullOrEmpty(x.Destination));
+
+        RuleFor(x => x.Page).GreaterThanOrEqualTo(1);
+        RuleFor(x => x.PageSize).InclusiveBetween(1, 100);
     }
 }

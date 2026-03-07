@@ -1,12 +1,14 @@
+using FlightStatus.Application.Abstractions;
 using FlightStatus.Application.Abstractions.Contracts;
 
 namespace FlightStatus.Application.UseCases.Flights.Queries.GetFlights;
 
-/// <summary>Запрос списка рейсов с фильтром по маршруту.</summary>
-public class GetFlightsQuery : IQuery<List<FlightDto>>
+public class GetFlightsQuery : IQuery<PagedResult<FlightDto>>
 {
     public string? Origin { get; set; }
     public string? Destination { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 20;
 }
 
 /// <summary>DTO списка рейсов для ответа API.</summary>

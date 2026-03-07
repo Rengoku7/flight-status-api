@@ -1,7 +1,9 @@
 using FlightStatus.Api.Extensions;
 using FlightStatus.Api.Models;
+using FlightStatus.Application.Abstractions;
 using FlightStatus.Application.UseCases.Flights.Commands.AddFlight;
 using FlightStatus.Application.UseCases.Flights.Commands.UpdateFlightStatus;
+using FlightStatus.Application.UseCases.Flights.Queries.GetFlightById;
 using FlightStatus.Application.UseCases.Flights.Queries.GetFlights;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -22,14 +24,31 @@ public class FlightsController : ControllerBase
         _mediator = mediator;
     }
 
-    /// <summary>Список рейсов. Сортировка по времени прилёта. Фильтр по пункту вылета и/или назначения — опционально.</summary>
+    /// <summary>Список рейсов с пагинацией. Сортировка по времени прилёта. Фильтр по Origin и/или Destination — опционально.</summary>
     /// <param name="origin">Пункт вылета (опционально).</param>
     /// <param name="destination">Пункт назначения (опционально).</param>
-    /// <response code="200">Список рейсов в data.</response>
+    /// <param name="page">Номер страницы (по умолчанию 1).</param>
+    /// <param name="pageSize">Размер страницы 1–100 (по умолчанию 20).</param>
+    /// <response code="200">В data: items, totalCount, page, pageSize.</response>
     [HttpGet]
-    public async Task<ApiResult<List<FlightDto>>> GetFlights([FromQuery] string? origin, [FromQuery] string? destination)
+    public async Task<ApiResult<PagedResult<FlightDto>>> GetFlights(
+        [FromQuery] string? origin,
+        [FromQuery] string? destination,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
     {
-        var result = await _mediator.Send(new GetFlightsQuery { Origin = origin, Destination = destination });
+        var result = await _mediator.Send(new GetFlightsQuery { Origin = origin, Destination = destination, Page = page, PageSize = pageSize });
+        return result.ToApiResult();
+    }
+
+    /// <summary>Рейс по id.</summary>
+    /// <param name="id">Id рейса.</param>
+    /// <response code="200">Рейс в data.</response>
+    /// <response code="404">Рейс не найден.</response>
+    [HttpGet("{id:int}")]
+    public async Task<ApiResult<FlightDto>> GetFlightById(int id)
+    {
+        var result = await _mediator.Send(new GetFlightByIdQuery { Id = id });
         return result.ToApiResult();
     }
 

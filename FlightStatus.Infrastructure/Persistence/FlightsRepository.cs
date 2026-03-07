@@ -13,7 +13,7 @@ public class FlightsRepository : IFlightsRepository
         _db = db;
     }
 
-    public async Task<IReadOnlyList<Flight>> GetFlightsAsync(string? origin, string? destination, CancellationToken ct = default)
+    public async Task<(IReadOnlyList<Flight> Items, int TotalCount)> GetFlightsPagedAsync(string? origin, string? destination, int page, int pageSize, CancellationToken ct = default)
     {
         try
         {
@@ -23,7 +23,12 @@ public class FlightsRepository : IFlightsRepository
                 query = useNpgsql ? query.Where(f => EF.Functions.ILike(f.Origin, origin)) : query.Where(f => f.Origin.ToLower() == origin.ToLower());
             if (!string.IsNullOrWhiteSpace(destination))
                 query = useNpgsql ? query.Where(f => EF.Functions.ILike(f.Destination, destination)) : query.Where(f => f.Destination.ToLower() == destination.ToLower());
-            return await query.OrderBy(f => f.Arrival).ToListAsync(ct);
+            var totalCount = await query.CountAsync(ct);
+            var items = await query.OrderBy(f => f.Arrival)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(ct);
+            return (items, totalCount);
         }
         catch (Exception ex) when (ex is not InfrastructureException)
         {

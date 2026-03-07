@@ -1,3 +1,4 @@
+using FlightStatus.Application.Abstractions;
 using FlightStatus.Application.Abstractions.Contracts;
 using FlightStatus.Application.Flights;
 using FlightStatus.Domain.Abstractions.Primitive;
@@ -6,7 +7,7 @@ using MediatR;
 namespace FlightStatus.Application.UseCases.Flights.Queries.GetFlights;
 
 /// <summary>Обработчик запроса списка рейсов</summary>
-public class GetFlightsQueryHandler : IQueryHandler<GetFlightsQuery, List<FlightDto>>
+public class GetFlightsQueryHandler : IQueryHandler<GetFlightsQuery, PagedResult<FlightDto>>
 {
     private readonly IFlightsRepository _repo;
 
@@ -15,10 +16,11 @@ public class GetFlightsQueryHandler : IQueryHandler<GetFlightsQuery, List<Flight
         _repo = repo;
     }
 
-    public async Task<Result<List<FlightDto>>> Handle(GetFlightsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResult<FlightDto>>> Handle(GetFlightsQuery request, CancellationToken cancellationToken)
     {
-        var flights = await _repo.GetFlightsAsync(request.Origin, request.Destination, cancellationToken);
-        var dtos = flights.Select(f => new FlightDto
+        var (items, totalCount) = await _repo.GetFlightsPagedAsync(
+            request.Origin, request.Destination, request.Page, request.PageSize, cancellationToken);
+        var dtos = items.Select(f => new FlightDto
         {
             Id = f.Id,
             Origin = f.Origin,
@@ -27,6 +29,12 @@ public class GetFlightsQueryHandler : IQueryHandler<GetFlightsQuery, List<Flight
             Arrival = f.Arrival,
             Status = f.Status.ToString()
         }).ToList();
-        return Result<List<FlightDto>>.Success(dtos);
+        return Result<PagedResult<FlightDto>>.Success(new PagedResult<FlightDto>
+        {
+            Items = dtos,
+            TotalCount = totalCount,
+            Page = request.Page,
+            PageSize = request.PageSize
+        });
     }
 }

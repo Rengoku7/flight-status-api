@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using FlightStatus.Api.Models;
+using FlightStatus.Application.Abstractions;
 using FlightStatus.Application.UseCases.Flights.Queries.GetFlights;
 using Xunit;
 
@@ -36,27 +37,30 @@ public class FlightsScenarioTests : IClassFixture<FlightStatusWebAppFactory>
     }
 
     [Fact]
-    public async Task GetFlights_WithAuth_Returns200AndList()
+    public async Task GetFlights_WithAuth_Returns200AndPagedList()
     {
         var client = await CreateAuthenticatedClientAsync();
         var response = await client.GetAsync("/api/flights");
         response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadFromJsonAsync<ApiResult<List<FlightDto>>>();
+        var result = await response.Content.ReadFromJsonAsync<ApiResult<PagedResult<FlightDto>>>();
         Assert.NotNull(result);
         Assert.True(result.Success);
-        Assert.NotNull(result.Data);
+        Assert.NotNull(result.Data?.Items);
+        Assert.True(result.Data.TotalCount >= 0);
+        Assert.Equal(1, result.Data.Page);
+        Assert.Equal(20, result.Data.PageSize);
     }
 
     [Fact]
     public async Task GetFlights_WithOriginFilter_ReturnsFiltered()
     {
         var client = await CreateAuthenticatedClientAsync();
-        var response = await client.GetAsync("/api/flights?origin=ALA");
+        var response = await client.GetAsync("/api/flights?origin=ALA&page=1&pageSize=10");
         response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadFromJsonAsync<ApiResult<List<FlightDto>>>();
+        var result = await response.Content.ReadFromJsonAsync<ApiResult<PagedResult<FlightDto>>>();
         Assert.NotNull(result);
         Assert.True(result.Success);
-        Assert.NotNull(result.Data);
+        Assert.NotNull(result.Data?.Items);
     }
 
     [Fact]

@@ -7,7 +7,10 @@ public interface IFlightsRepository
 {
     /// <param name="origin">Фильтр по пункту вылета (опционально).</param>
     /// <param name="destination">Фильтр по пункту назначения (опционально).</param>
-    Task<IReadOnlyList<Flight>> GetFlightsAsync(string? origin, string? destination, CancellationToken ct = default);
+    /// <param name="page">Номер страницы</param>
+    /// <param name="pageSize">Размер страницы.</param>
+    /// <returns>Элементы страницы и общее количество записей.</returns>
+    Task<(IReadOnlyList<Flight> Items, int TotalCount)> GetFlightsPagedAsync(string? origin, string? destination, int page, int pageSize, CancellationToken ct = default);
     Task<Flight?> GetByIdAsync(int id, CancellationToken ct = default);
     /// <returns>Id созданного рейса.</returns>
     Task<int> AddAsync(Flight flight, CancellationToken ct = default);

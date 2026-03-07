@@ -18,10 +18,11 @@ public class FlightsRepository : IFlightsRepository
         try
         {
             var query = _db.Flights.AsNoTracking();
+            var useNpgsql = _db.Database.ProviderName?.Contains("Npgsql") == true;
             if (!string.IsNullOrWhiteSpace(origin))
-                query = query.Where(f => EF.Functions.ILike(f.Origin, origin));
+                query = useNpgsql ? query.Where(f => EF.Functions.ILike(f.Origin, origin)) : query.Where(f => f.Origin.ToLower() == origin.ToLower());
             if (!string.IsNullOrWhiteSpace(destination))
-                query = query.Where(f => EF.Functions.ILike(f.Destination, destination));
+                query = useNpgsql ? query.Where(f => EF.Functions.ILike(f.Destination, destination)) : query.Where(f => f.Destination.ToLower() == destination.ToLower());
             return await query.OrderBy(f => f.Arrival).ToListAsync(ct);
         }
         catch (Exception ex) when (ex is not InfrastructureException)

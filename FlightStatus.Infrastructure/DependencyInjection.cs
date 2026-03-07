@@ -12,16 +12,26 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
         services.AddScoped<AuditSaveChangesInterceptor>();
 
-        services.AddDbContext<ApplicationDbContext>((sp, options) =>
+        if (configuration.GetValue<bool>("UseInMemoryDatabase"))
         {
-            options.UseNpgsql(connectionString);
-            options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
-        });
+            services.AddDbContext<ApplicationDbContext>((sp, options) =>
+            {
+                options.UseInMemoryDatabase("TestDb");
+                options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
+            });
+        }
+        else
+        {
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            services.AddDbContext<ApplicationDbContext>((sp, options) =>
+            {
+                options.UseNpgsql(connectionString);
+                options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
+            });
+        }
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IFlightsRepository, FlightsRepository>();

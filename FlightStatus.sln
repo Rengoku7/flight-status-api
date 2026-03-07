@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightStatus.Infrastructure", "FlightStatus.Infrastructure\FlightStatus.Infrastructure.csproj", "{B298DAF1-CD94-43E4-8C99-EEA27E758A54}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightStatus.Api", "FlightStatus.Api\FlightStatus.Api.csproj", "{70973E35-4E35-4D1A-8729-5D72FCB5FB2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightStatus.Tests", "FlightStatus.Tests\FlightStatus.Tests.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{70973E35-4E35-4D1A-8729-5D72FCB5FB2E}.Release|x64.Build.0 = Release|Any CPU
 		{70973E35-4E35-4D1A-8729-5D72FCB5FB2E}.Release|x86.ActiveCfg = Release|Any CPU
 		{70973E35-4E35-4D1A-8729-5D72FCB5FB2E}.Release|x86.Build.0 = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

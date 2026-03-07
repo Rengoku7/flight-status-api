@@ -1,6 +1,7 @@
 using FlightStatus.Application.Abstractions.Contracts;
 using FlightStatus.Application.Flights;
 using FlightStatus.Application.UseCases.Flights.Queries.GetFlights;
+using FlightStatus.Domain.Abstractions.Primitive;
 using MediatR;
 
 namespace FlightStatus.Application.UseCases.Flights.Queries.GetFlightById;

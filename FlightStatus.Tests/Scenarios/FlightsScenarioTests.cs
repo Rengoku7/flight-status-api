@@ -100,7 +100,9 @@ public class FlightsScenarioTests : IClassFixture<FlightStatusWebAppFactory>
         var flightId = addResult?.Data?.Id ?? 0;
         Assert.True(flightId > 0);
 
-        var patchResponse = await client.PatchAsJsonAsync($"/api/flights/{flightId}/status", new { status = "Delayed" });
+        var patchRequest = new HttpRequestMessage(HttpMethod.Patch, $"/api/flights/{flightId}/status")
+            { Content = JsonContent.Create(new { status = "Delayed" }) };
+        var patchResponse = await client.SendAsync(patchRequest);
         patchResponse.EnsureSuccessStatusCode();
     }
 
@@ -108,7 +110,9 @@ public class FlightsScenarioTests : IClassFixture<FlightStatusWebAppFactory>
     public async Task UpdateFlightStatus_NonExistentFlight_Returns404()
     {
         var client = await CreateAuthenticatedClientAsync();
-        var response = await client.PatchAsJsonAsync("/api/flights/999999/status", new { status = "Cancelled" });
+        var request = new HttpRequestMessage(HttpMethod.Patch, "/api/flights/999999/status")
+            { Content = JsonContent.Create(new { status = "Cancelled" }) };
+        var response = await client.SendAsync(request);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 

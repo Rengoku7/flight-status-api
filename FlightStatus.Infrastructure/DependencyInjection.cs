@@ -2,6 +2,8 @@ using FlightStatus.Application.Auth;
 using FlightStatus.Application.Flights;
 using FlightStatus.Infrastructure.Persistence;
 using FlightStatus.Infrastructure.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +33,21 @@ public static class DependencyInjection
                 options.UseNpgsql(connectionString);
                 options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
             });
+        }
+
+        // Кэш: Redis если указан, иначе in-memory распределённый кэш.
+        var redisConnection = configuration.GetConnectionString("Redis");
+        if (!string.IsNullOrWhiteSpace(redisConnection))
+        {
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = redisConnection;
+                options.InstanceName = "flight-status-api:";
+            });
+        }
+        else
+        {
+            services.AddDistributedMemoryCache();
         }
 
         services.AddScoped<IAuthService, AuthService>();

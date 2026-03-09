@@ -28,7 +28,7 @@ public class AuthorizationScenarioTests : IClassFixture<FlightStatusWebAppFactor
     public async Task GetFlights_WithValidToken_Returns200()
     {
         var client = _factory.CreateClient();
-        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new { username = "moderator", password = "moderator" });
+        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new { username = "moderator", password = "Moderator1" });
         loginResponse.EnsureSuccessStatusCode();
         var loginResult = await loginResponse.Content.ReadFromJsonAsync<ApiResult<LoginPayload>>();
         var token = loginResult?.Data?.Token ?? "";

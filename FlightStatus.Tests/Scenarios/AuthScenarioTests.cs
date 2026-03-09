@@ -20,7 +20,7 @@ public class AuthScenarioTests : IClassFixture<FlightStatusWebAppFactory>
         var response = await _client.PostAsJsonAsync("/api/auth/login", new
         {
             username = "moderator",
-            password = "moderator"
+            password = "Moderator1"
         });
 
         var body = await response.Content.ReadAsStringAsync();
@@ -39,7 +39,7 @@ public class AuthScenarioTests : IClassFixture<FlightStatusWebAppFactory>
         var response = await _client.PostAsJsonAsync("/api/auth/login", new
         {
             username = "moderator",
-            password = "wrong"
+            password = "WrongPass1"
         });
 
         Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, $"Expected 401, got {(int)response.StatusCode}. Body: {await response.Content.ReadAsStringAsync()}");
@@ -51,7 +51,7 @@ public class AuthScenarioTests : IClassFixture<FlightStatusWebAppFactory>
         var response = await _client.PostAsJsonAsync("/api/auth/login", new
         {
             username = "nobody",
-            password = "nobody"
+            password = "Nobody123"
         });
 
         Assert.True(response.StatusCode == HttpStatusCode.Unauthorized, $"Expected 401, got {(int)response.StatusCode}. Body: {await response.Content.ReadAsStringAsync()}");

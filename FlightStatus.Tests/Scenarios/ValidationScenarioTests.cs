@@ -19,7 +19,7 @@ public class ValidationScenarioTests : IClassFixture<FlightStatusWebAppFactory>
     public async Task Login_EmptyUsername_Returns400_WithErrors()
     {
         var client = _factory.CreateClient();
-        var response = await client.PostAsJsonAsync("/api/auth/login", new { username = "", password = "p" });
+        var response = await client.PostAsJsonAsync("/api/auth/login", new { username = "", password = "Password1" });
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var result = await response.Content.ReadFromJsonAsync<ApiResult<object>>();
         Assert.NotNull(result);
@@ -32,7 +32,7 @@ public class ValidationScenarioTests : IClassFixture<FlightStatusWebAppFactory>
     public async Task AddFlight_InvalidBody_Returns400_WithErrors()
     {
         var client = _factory.CreateClient();
-        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new { username = "moderator", password = "moderator" });
+        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new { username = "moderator", password = "Moderator1" });
         loginResponse.EnsureSuccessStatusCode();
         var loginResult = await loginResponse.Content.ReadFromJsonAsync<ApiResult<LoginPayload>>();
         var token = loginResult?.Data?.Token ?? "";

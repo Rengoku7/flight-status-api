@@ -6,6 +6,7 @@ using FlightStatus.Infrastructure.Persistence;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
@@ -43,6 +44,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
+// TODO: возвращать 401/403 в формате ApiResult (как ExceptionFilter) в виде handler middleware для единого формата ответов
 
 builder.Services.AddControllers(o => o.Filters.Add<FlightStatus.Api.Filters.ExceptionFilter>())
     .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
@@ -105,14 +107,36 @@ app.Use(async (context, next) =>
     }
 });
 
-using (var scope = app.Services.CreateScope())
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+const int dbRetryCount = 10;
+const int dbRetryDelayMs = 2000;
+for (var attempt = 1; attempt <= dbRetryCount; attempt++)
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if (app.Environment.IsEnvironment("Testing"))
-        await db.Database.EnsureCreatedAsync();
-    else
-        await db.Database.MigrateAsync();
-    await DbSeeder.SeedAsync(db);
+    try
+    {
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            if (app.Environment.IsEnvironment("Testing"))
+                await db.Database.EnsureCreatedAsync();
+            else
+                await db.Database.MigrateAsync();
+            await DbSeeder.SeedAsync(db);
+
+            if (!app.Environment.IsEnvironment("Testing"))
+            {
+                var cache = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
+                await CacheWarmer.WarmFlightsCacheAsync(db, cache);
+                logger.LogInformation("Кэш рейсов прогрет для демонстрации.");
+            }
+        }
+        break;
+    }
+    catch (Exception ex) when (attempt < dbRetryCount)
+    {
+        logger.LogWarning(ex, "Ожидание БД (попытка {Attempt}/{Total})…", attempt, dbRetryCount);
+        await Task.Delay(dbRetryDelayMs);
+    }
 }
 
 app.UseSwagger();

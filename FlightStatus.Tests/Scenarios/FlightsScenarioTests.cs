@@ -21,7 +21,7 @@ public class FlightsScenarioTests : IClassFixture<FlightStatusWebAppFactory>
     private async Task<HttpClient> CreateAuthenticatedClientAsync()
     {
         var client = _factory.CreateClient();
-        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new { username = "moderator", password = "moderator" });
+        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new { username = "moderator", password = "Moderator1" });
         loginResponse.EnsureSuccessStatusCode();
         var loginResult = await loginResponse.Content.ReadFromJsonAsync<ApiResult<LoginPayload>>();
         var token = loginResult?.Data?.Token ?? throw new InvalidOperationException("No token");
@@ -162,7 +162,7 @@ public class FlightsScenarioTests : IClassFixture<FlightStatusWebAppFactory>
     public async Task AddFlight_WithoutModeratorRole_Returns403()
     {
         var client = _factory.CreateClient();
-        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new { username = "user", password = "user" });
+        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new { username = "user", password = "Reader1" });
         if (!loginResponse.IsSuccessStatusCode)
             return; 
         var loginResult = await loginResponse.Content.ReadFromJsonAsync<ApiResult<LoginPayload>>();

@@ -75,7 +75,9 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddOpenApi();
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>(name: "database");
 
 var app = builder.Build();
 
@@ -115,8 +117,8 @@ using (var scope = app.Services.CreateScope())
 
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Flight Status API v1"));
-if (app.Environment.IsDevelopment())
-    app.MapOpenApi();
+
+app.MapHealthChecks("/health");
 
 if (!app.Environment.IsEnvironment("Testing"))
     app.UseHttpsRedirection();
